@@ -9,13 +9,15 @@ Emotions used in the simulation and the SW will be discrete values-
 - sad 3
 - agitated/afraid/anxious 4
 
-"noise" will be a discrete value. 
+"noise" will be a discrete value. it will be modelled into distraction and emotion
 0 means the sample difference test says acceptable i.e. negligible difference from when the session started 
 1 points to sufficient difference in noise levels from before, potentially pointing to agitation by the child.
 2 means high difference, meaning huge agitation
 we need to decide the percentages of difference in means/variance for 0,1,2
 
 "distracted" will be between 0,1,2,3,4. Unaddressed distraction could have a 20% chance of increasing distraction each time step
+
+current gain capability- simple increasing difficulty shouldn't increase knowledge gain. the child's skill level matters. gain capability will be known to the model, and will be updated on the basis of tests. discrete integer
 
 ACTION DESCRIPTION (add description for actions along with possible outcomes)
 
@@ -29,5 +31,9 @@ play calming music to calm emotion
 
 decrease difficulty
 increase difficulty
-    higher difficulty would mean lower chance of distraction, but higher chance of agitation, and lower knowledge gain
+    higher difficulty would mean higher chance of distraction, higher chance of agitation, but higher knowledge gain
     vice versa for decreasing difficulty
+
+CHILD PERSONALITY 
+	emotional rigidity- higher rigidity means lower chance of effector to affect emotion
+	distraction susceptibility- how likely child is to be distracter

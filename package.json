@@ -1,0 +1,25 @@
+{
+  "name": "attentia.ai",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/fzzm05/attentia.ai#readme",
+  "bugs": {
+    "url": "https://github.com/fzzm05/attentia.ai/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fzzm05/attentia.ai.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "fft-js": "^0.0.12",
+    "mic": "^2.1.2"
+  }
+}

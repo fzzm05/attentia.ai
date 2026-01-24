@@ -1,70 +1,48 @@
-# attentia.ai 🧠🎧  
-**Continuous Audio Monitoring & Window-Based Signal Analysis**
+# attentia.ai 🧠  
+**attention.ai** is a web-based AI platform designed to help individuals with cognitive and neurodevelopmental disabilities improve focus and engagement while studying.
 
-`attentia.ai` is a Python-based audio monitoring system designed to continuously record microphone input and analyze short time windows (7–10 seconds) of audio to detect changes in sound patterns.
+The platform continuously infers user attention by combining signals from:
 
-The system extracts simple, interpretable audio features and compares them against recent history using percentage-based change, making it suitable for research, experimentation, and downstream ML or reinforcement-learning pipelines.
+- 📷 **Camera input** — to detect facial cues and emotional states  
+- 🎤 **Microphone input** — to detect disturbances, background noise, and audio patterns  
 
----
+These multimodal signals are processed by a **custom reinforcement learning (RL) model**, which evaluates whether the user is focused or distracted in real time.
 
-## ✨ Core Idea
+Based on the inferred state, the system dynamically:
+- Identifies the type and level of distraction  
+- Determines whether attention has drifted  
+- Prompts the user with adaptive interventions  
+- Suggests changes in study behavior or environment  
 
-> “What changed in the last few seconds compared to just before?”
-
-Instead of complex models or heavy inference, `attentia.ai` focuses on:
-- Temporal consistency
-- Relative change
-- Low-latency signal statistics
-
----
-
-## 🔍 What the System Does
-
-1. Continuously records audio from the user’s microphone  
-2. Every 7–10 seconds (window), computes:
-   - Average amplitude (RMS)
-   - Variance of amplitude
-   - Average frequency (spectral centroid)
-   - Variance of frequency  
-3. Maintains a queue of the last 3 windows  
-4. On every new window:
-   - Compares it against the mean of the previous two
-   - Computes percentage difference for each metric  
-5. Outputs window features and comparison results  
-
-**Nothing more is performed at this stage:**
-- ❌ No emotion inference  
-- ❌ No speech detection  
-- ❌ No ML models  
-- ❌ No noise classification  
+The goal is not surveillance, but supportive guidance — helping users gently re-orient their attention in a way that is personalized, explainable, and non-intrusive.
 
 ---
+
+## 🎯 Mission
+
+To provide an accessible, intelligent, and adaptive focus-assistance system that empowers individuals with cognitive disabilities to study more effectively and independently.
+
 
 ## 📁 Project Structure
 ATTENTIA.AI/
-│
-├── src/
-│ └── attentia_ai/
-│ ├── audio_monitor.py
-│ └── helpers/
-│ ├── config.py
-│ ├── dsp.py
-│ ├── emotion.py
-│ └── init.py
-│
-├── scripts/
-│ └── run_audio_monitor.py
-│
-├── docs/
-│ └── guide.md
-│
-├── data/
-│
-├── .venv/
-├── requirements.txt
-├── pyproject.toml
-├── README.md
-└── .gitignore
+├── data/                    # Local data storage (ignored by git)
+├── docs/                    # Documentation files
+│   └── guide.md
+├── scripts/                 # Entry point scripts for execution
+│   └── run_audio_monitor.py
+├── src/                     # Main source code directory
+│   └── attentia_ai/
+│       ├── helpers/         # Utility and processing modules
+│       │   ├── __init__.py
+│       │   ├── config.py
+│       │   ├── dsp.py
+│       │   └── emotion.py
+│       ├── __init__.py
+│       └── audio_monitor.py
+├── .gitignore               # Files to exclude from version control
+├── pyproject.toml           # Build system and project metadata
+├── README.md                # Project overview and instructions
+└── requirements.txt         # List of dependencies
 
 ## 🚀 How to Run
 
@@ -73,21 +51,23 @@ ATTENTIA.AI/
 source .venv/bin/activate
 ```
 ### 2. Install dependencies
-`pip install -r requirements.txt`
+```bash
+source pip install -r requirements.txt
+```
 ### 3. Run the audio monitor
-`PYTHONPATH=src python scripts/run_audio_monitor.py`
+```bash
+source PYTHONPATH=src python scripts/run_audio_monitor.py
+```
 
 Press Ctrl + C to stop.
 
-## 🖥️ Dependencies
+## Dependencies (so far)
 
 - Python 3.10+
 - numpy
 - sounddevice
 
----
-
-## 🎯 Intended Use Cases
+## Intended Use Cases
 
 - Attention and focus research
 - Behavioral signal analysis
@@ -95,9 +75,7 @@ Press Ctrl + C to stop.
 - Reinforcement learning state inputs
 - Lightweight real-time monitoring
 
----
-
-## 🔮 Future Extensions
+## Future Extensions
 
 - Emotion inference models
 - Speech vs noise classification
@@ -106,5 +84,3 @@ Press Ctrl + C to stop.
 - Dataset logging and replay
 - API / service mode
 - Embedded / Raspberry Pi deployment
-
----

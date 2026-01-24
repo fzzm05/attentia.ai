@@ -16,14 +16,14 @@ Based on the inferred state, the system dynamically:
 
 The goal is not surveillance, but supportive guidance — helping users gently re-orient their attention in a way that is personalized, explainable, and non-intrusive.
 
----
-
-## 🎯 Mission
+## Goal
 
 To provide an accessible, intelligent, and adaptive focus-assistance system that empowers individuals with cognitive disabilities to study more effectively and independently.
 
 
 ## 📁 Project Structure
+
+```text
 ATTENTIA.AI/
 ├── data/                    # Local data storage (ignored by git)
 ├── docs/                    # Documentation files
@@ -43,6 +43,7 @@ ATTENTIA.AI/
 ├── pyproject.toml           # Build system and project metadata
 ├── README.md                # Project overview and instructions
 └── requirements.txt         # List of dependencies
+```        
 
 ## 🚀 How to Run
 

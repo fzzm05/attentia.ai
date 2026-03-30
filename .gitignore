@@ -10,6 +10,7 @@ build/
 # Virtual env
 .venv/
 *.env
+.cache/
 
 # OS / editors
 .DS_Store

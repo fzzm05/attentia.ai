@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attentia Local Demo</title>
+    <style>
+      :root {
+        --bg: #f2efe8;
+        --panel: rgba(255, 255, 255, 0.86);
+        --ink: #1b1e1f;
+        --muted: #526065;
+        --accent: #0c6c6f;
+        --accent-soft: #d8f0eb;
+        --danger: #a33434;
+        --border: rgba(12, 108, 111, 0.15);
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, #f8e9d2 0, transparent 30%),
+          radial-gradient(circle at top right, #d3f0ef 0, transparent 34%),
+          linear-gradient(180deg, #f6f2eb 0%, #e7ece7 100%);
+      }
+
+      main {
+        width: min(1100px, calc(100vw - 32px));
+        margin: 24px auto;
+        display: grid;
+        gap: 18px;
+      }
+
+      .hero,
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 16px 50px rgba(31, 53, 54, 0.08);
+      }
+
+      .hero {
+        padding: 28px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(2rem, 6vw, 3.75rem);
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 18px;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 11px 18px;
+        background: var(--accent);
+        color: white;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      button.secondary {
+        background: #eff4f4;
+        color: var(--ink);
+      }
+
+      button.danger {
+        background: var(--danger);
+      }
+
+      label {
+        display: block;
+        margin: 14px 0 6px;
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+
+      select {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        padding: 10px 12px;
+        background: white;
+        font: inherit;
+      }
+
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .signal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+
+      .pill {
+        border-radius: 18px;
+        padding: 14px;
+        background: var(--accent-soft);
+      }
+
+      .pill strong {
+        display: block;
+        font-size: 1.4rem;
+        margin-top: 8px;
+      }
+
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.92rem;
+        line-height: 1.45;
+      }
+
+      .banner {
+        border-radius: 18px;
+        padding: 16px 18px;
+        background: #fff7dc;
+        border: 1px solid rgba(163, 111, 22, 0.15);
+        color: #6f5318;
+      }
+
+      .banner strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .banner.ok {
+        background: #e4f4ea;
+        border-color: rgba(45, 117, 76, 0.15);
+        color: #245738;
+      }
+
+      ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <p>Local presentation demo</p>
+        <h1>Attentia Session Monitor</h1>
+        <p>
+          This placeholder frontend starts the local session and shows the raw
+          backend payload until your real study interface is ready.
+        </p>
+      </section>
+
+      <section class="controls">
+        <article class="panel">
+          <p>Session Controls</p>
+          <div class="button-row">
+            <button id="startBtn">Start Session</button>
+            <button id="refreshBtn" class="secondary">Refresh</button>
+            <button id="stopBtn" class="danger">Stop Session</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <p>Child Profile Inputs</p>
+          <label for="difficulty">Current difficulty</label>
+          <select id="difficulty">
+            <option value="0">0 - easiest</option>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4 - toughest</option>
+          </select>
+          <label for="gain">Gain capability</label>
+          <select id="gain">
+            <option value="0">0 - low</option>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4 - high</option>
+          </select>
+          <div class="button-row">
+            <button id="profileBtn" class="secondary">Update Profile</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel status-grid">
+        <div class="pill">
+          Session
+          <strong id="runningValue">stopped</strong>
+        </div>
+        <div class="pill">
+          Emotion
+          <strong id="emotionValue">-</strong>
+        </div>
+        <div class="pill">
+          Distraction
+          <strong id="distractionValue">-</strong>
+        </div>
+        <div class="pill">
+          Action
+          <strong id="actionValue">-</strong>
+        </div>
+      </section>
+
+      <section id="preflightBanner" class="banner">
+        <strong>Checking local demo readiness...</strong>
+        <div id="preflightText">Waiting for backend diagnostics.</div>
+      </section>
+
+      <section class="panel signal-grid">
+        <div class="pill">
+          Camera
+          <strong id="cameraValue">-</strong>
+        </div>
+        <div class="pill">
+          Microphone
+          <strong id="audioValue">-</strong>
+        </div>
+        <div class="pill">
+          Noise Level
+          <strong id="noiseValue">-</strong>
+        </div>
+        <div class="pill">
+          RL Source
+          <strong id="policyValue">-</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <p>Latest Backend Payload</p>
+        <pre id="payload">Waiting for backend...</pre>
+      </section>
+    </main>
+
+    <script>
+      const payloadNode = document.getElementById("payload");
+      const runningNode = document.getElementById("runningValue");
+      const emotionNode = document.getElementById("emotionValue");
+      const distractionNode = document.getElementById("distractionValue");
+      const actionNode = document.getElementById("actionValue");
+      const cameraNode = document.getElementById("cameraValue");
+      const audioNode = document.getElementById("audioValue");
+      const noiseNode = document.getElementById("noiseValue");
+      const policyNode = document.getElementById("policyValue");
+      const preflightBanner = document.getElementById("preflightBanner");
+      const preflightText = document.getElementById("preflightText");
+
+      async function callApi(url, options = {}) {
+        const response = await fetch(url, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        const data = await response.json();
+        render(data);
+        return data;
+      }
+
+      function render(data) {
+        payloadNode.textContent = JSON.stringify(data, null, 2);
+        const session = data.session || {};
+        runningNode.textContent = session.running ? "running" : "stopped";
+        emotionNode.textContent = `${session.emotion ?? "-"} (${data.camera?.emotion_label || "unknown"})`;
+        distractionNode.textContent = `${session.distraction ?? "-"} `;
+        actionNode.textContent = session.current_action_label || "-";
+        cameraNode.textContent = data.camera?.source || "idle";
+        audioNode.textContent = data.audio?.source || "idle";
+        noiseNode.textContent = `${data.audio?.noise_level ?? "-"} `;
+        policyNode.textContent = data.decision?.source || "waiting";
+
+        document.getElementById("difficulty").value = String(session.difficulty ?? 2);
+        document.getElementById("gain").value = String(session.gain_capability ?? 2);
+      }
+
+      function renderPreflight(data) {
+        if (data.ready) {
+          preflightBanner.className = "banner ok";
+          preflightText.innerHTML = "Core demo pieces are ready. If camera is blocked, the session will still run with fallback camera state.";
+          return;
+        }
+
+        preflightBanner.className = "banner";
+        const issues = (data.issues || []).map((issue) => `<li>${issue}</li>`).join("");
+        preflightText.innerHTML = issues
+          ? `<div>The demo can start, but there are setup issues to know about:</div><ul>${issues}</ul>`
+          : "The backend reported preflight issues.";
+      }
+
+      async function refresh() {
+        try {
+          const [statusResponse, preflightResponse] = await Promise.all([
+            fetch("/api/status"),
+            fetch("/api/preflight"),
+          ]);
+          const statusData = await statusResponse.json();
+          const preflightData = await preflightResponse.json();
+          render(statusData);
+          renderPreflight(preflightData);
+        } catch (error) {
+          payloadNode.textContent = `Backend request failed: ${error}`;
+        }
+      }
+
+      document.getElementById("startBtn").addEventListener("click", () =>
+        callApi("/api/session/start", { method: "POST" })
+      );
+      document.getElementById("refreshBtn").addEventListener("click", refresh);
+      document.getElementById("stopBtn").addEventListener("click", () =>
+        callApi("/api/session/stop", { method: "POST" })
+      );
+      document.getElementById("profileBtn").addEventListener("click", () =>
+        callApi("/api/session/profile", {
+          method: "POST",
+          body: JSON.stringify({
+            difficulty: Number(document.getElementById("difficulty").value),
+            gain_capability: Number(document.getElementById("gain").value),
+          }),
+        })
+      );
+
+      refresh();
+      setInterval(refresh, 1500);
+    </script>
+  </body>
+</html>

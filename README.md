@@ -170,7 +170,7 @@ http://127.0.0.1:8000
 - `docs/operations.md`
   setup, environment, permissions, troubleshooting, and demo checklist
 
-## Intended Next Steps
+## Intended Next Step
 
 - integrate the final frontend experience
 - refine camera-state classification with validated model logic

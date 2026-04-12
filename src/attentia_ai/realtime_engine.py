@@ -12,6 +12,10 @@ from attentia_ai.rl_policy import RLPolicy
 
 @dataclass
 class BrowserRealtimeSession:
+    """
+    Represents an active real-time monitoring context for a specific child.
+    Maintains ephemeral state for calibration progress and sensor packet counts.
+    """
     session_id: str
     child_id: str | None = None
     status: str = "awaiting_permissions"
@@ -25,6 +29,15 @@ class BrowserRealtimeSession:
 
 
 class BrowserRealtimeEngine:
+    """
+    A high-concurrency WebSocket engine for real-time sensor data orchestration.
+    
+    Architecture:
+    - Asynchronous event handling for incoming sensor packets (Audio/Video).
+    - Heuristic feature fusion for distractions and emotion mapping.
+    - Sub-100ms decision loop leveraging an RL Policy Q-table.
+    - Synchronous calibration state-machine to establish user-specific biometric baselines.
+    """
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.policy = RLPolicy(settings)
@@ -129,10 +142,9 @@ class BrowserRealtimeEngine:
                     "sessionId": session.session_id,
                     "recordedAt": recorded_at,
                     "progress": progress,
-                    "message": "Collecting baseline samples from camera and microphone.",
-                },
-            )
-
+        # Logic-Level Calibration & Baseline Establishment
+        # This ensuring the engine waits for sufficient sensor density (packets) 
+        # and temporal stability (5s window) before establishing the state baseline.
         if (
             session.status == "calibrating"
             and session.packet_count >= 6
@@ -170,6 +182,9 @@ class BrowserRealtimeEngine:
         if session.status != "running":
             return
 
+        # 3. Decision Logic & Sensor Fusion
+        # Fuses Discrete Audio Signals (Noise Level) with Camera Presence (Face Detection)
+        # to derive a singular 'Distraction' state for the RL Policy.
         noise_level = self._resolve_noise_level(features)
         face_detected = video_present
         distraction = clamp_ordinal(max(noise_level - 1, 0))

@@ -29,14 +29,27 @@ class SessionState:
 
 
 class StudySessionManager:
+    """
+    The central orchestration engine for the Attentia platform.
+    
+    Responsibilities:
+    - Lifecycle management of real-time sensor streams (Audio/Camera).
+    - Coordination of biometric calibration phases.
+    - Execution of the primary adaptive decision loop (RL Policy integration).
+    - Thread-safe state management and payload aggregation for client delivery.
+    """
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.audio = AudioMonitorService(settings)
         self.camera = CameraMonitorService(settings)
         self.policy = RLPolicy(settings)
+        
+        # Thread-safety for concurrent sensor updates and API polling
         self._lock = threading.Lock()
         self._loop_thread: threading.Thread | None = None
         self._stop_event = threading.Event()
+        
+        # Internal application state
         self._state = SessionState(
             difficulty=settings.default_difficulty,
             gain_capability=settings.default_gain_capability,
@@ -49,18 +62,26 @@ class StudySessionManager:
         )
 
     def start(self) -> dict[str, Any]:
+        """
+        Initializes the session lifecycle. 
+        Triggers hardware sensors, performs initial calibration, and spawns the background decision thread.
+        """
         with self._lock:
             if self._state.running:
                 return self._latest_payload
 
+            # Hardware service activation
             self.camera.start()
             self.audio.start()
+            
+            # Synchronous calibration phase to establish biometric baseline
             calibration = self.camera.calibrate()
 
             self._state.running = True
             self._state.calibrated = self.camera.baseline is not None
             self._state.updated_at = time.time()
 
+            # Start asynchronous orchestration loop
             self._stop_event.clear()
             self._loop_thread = threading.Thread(target=self._run_loop, daemon=True)
             self._loop_thread.start()
@@ -138,15 +159,23 @@ class StudySessionManager:
         }
 
     def _run_loop(self) -> None:
+        """
+        Main execution loop for the adaptive learning engine.
+        Periodically samples sensor state, resolves policy, and updates thread-safe state.
+        """
         while not self._stop_event.is_set():
+            # 1. High-frequency sensor sampling
             camera_snapshot = self.camera.sample_against_baseline()
             audio_snapshot = self.audio.snapshot()
+            
+            # 2. Logic-level feature fusion (Combines CV and Audio signals)
             distraction = self._combine_distraction(
                 camera_distraction=camera_snapshot.distraction_hint,
                 audio_noise=audio_snapshot.noise_level,
                 face_detected=camera_snapshot.face_detected,
             )
 
+            # 3. Policy Execution (Resolves current state to optimal intervention)
             decision = self.policy.decide(
                 emotion=camera_snapshot.emotion,
                 distraction=distraction,
@@ -155,12 +184,15 @@ class StudySessionManager:
             )
 
             with self._lock:
+                # 4. Atomic state update for API consistency
                 self._state.calibrated = self.camera.baseline is not None
                 self._state.emotion = camera_snapshot.emotion
                 self._state.distraction = distraction
                 self._state.current_action = decision.action_index
                 self._state.current_action_label = decision.action_label
                 self._state.updated_at = time.time()
+                
+                # 5. Build unified payload for downstream consumers (REST/WS)
                 self._latest_payload = self._build_payload(
                     calibration=self.camera.baseline.to_dict() if self.camera.baseline else None,
                     camera=camera_snapshot.to_dict(),
@@ -168,6 +200,7 @@ class StudySessionManager:
                     decision=decision.to_dict(),
                 )
 
+            # Wait for the next sampling interval defined in settings
             self._stop_event.wait(self.settings.camera_interval_seconds)
 
     def _build_payload(

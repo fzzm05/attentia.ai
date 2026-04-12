@@ -1,0 +1,13 @@
+alter table public.profiles disable row level security;
+alter table public.parent_accounts disable row level security;
+alter table public.children disable row level security;
+alter table public.child_profiles disable row level security;
+alter table public.devices disable row level security;
+alter table public.sessions disable row level security;
+alter table public.session_state_events disable row level security;
+alter table public.session_action_events disable row level security;
+alter table public.session_sensor_snapshots disable row level security;
+alter table public.intervention_catalog disable row level security;
+alter table public.alerts disable row level security;
+alter table public.child_progress_reports disable row level security;
+alter table public.audit_logs disable row level security;

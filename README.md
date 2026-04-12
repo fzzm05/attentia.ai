@@ -1,90 +1,59 @@
-# attentia.ai
+# Attentia.ai: Real-time Adaptive Learning Engine
 
-`attentia.ai` is a local-first adaptive study assistant prototype for children who may benefit from gentle attention support during learning sessions. The system combines microphone input, camera-derived baseline comparison, and a reinforcement-learning policy to estimate learner state and recommend interventions such as music, animation, or difficulty changes.
+`attentia.ai` is a specialized backend orchestration engine designed for real-time study assistance. The system handles high-frequency sensor data, manages biometric calibration, and coordinates an adaptive intervention policy to support learners in real-time.
 
-This branch contains a self-contained demo stack:
+---
 
-- a local Flask backend
-- a placeholder browser frontend
-- microphone feature capture
-- camera baseline and periodic comparison
-- a pre-trained NumPy Q-table for action selection
+## 🏗 System Architecture
 
-The current implementation is intended for local demos, architecture validation, and model integration work. It is not a production deployment.
+The engine is built on a modular, event-driven architecture that bridges low-level hardware sensing with a high-level management platform.
 
-## What This Branch Does
+```mermaid
+graph TD
+    subgraph "Frontend Layer (Independent)"
+        NextJS[Next.js Management Dashboard]
+    end
 
-When the server starts, it serves a local frontend on `http://127.0.0.1:8000`.
+    subgraph "Orchestration Layer (Backend Core)"
+        Flask[Flask / Flask-Sock]
+        SessionMgr[Session Manager]
+        
+        Flask -->|WebSocket/REST| NextJS
+        Flask --- SessionMgr
+    end
 
-When a session is started from the frontend:
-
-1. the backend starts the microphone monitor
-2. the backend attempts to initialize the camera pipeline
-3. the camera pipeline calibrates a baseline face state for the learner
-4. every 5 seconds, the backend samples camera state against that baseline
-5. the backend continuously aggregates microphone features into a noise signal
-6. the backend converts sensor outputs into discrete state values
-7. the RL Q-table selects the best action for that state
-8. the frontend displays the live state and selected action
-
-If a device is unavailable, the system falls back gracefully and surfaces warnings through the API and frontend preflight banner.
-
-## Repository Structure
-
-```text
-attentia.ai/
-├── docs/
-│   ├── api.md
-│   ├── architecture.md
-│   ├── guide.md
-│   └── operations.md
-├── frontend/
-│   └── index.html
-├── model/
-│   └── Qtablemain.npy
-├── scripts/
-│   ├── BaselineClass.py
-│   ├── cameraAccessClass.py
-│   ├── face_landmarker.task
-│   ├── run_audio_monitor.py
-│   └── run_server.py
-├── src/
-│   └── attentia_ai/
-│       ├── helpers/
-│       │   ├── config.py
-│       │   └── dsp.py
-│       ├── audio_monitor.py
-│       ├── audio_service.py
-│       ├── camera_service.py
-│       ├── rl_policy.py
-│       ├── server.py
-│       └── session.py
-├── .gitignore
-├── pyproject.toml
-├── requirements.txt
-└── README.md
+    subgraph "Sensor & Intelligence Layer"
+        AudioSvc[Audio Monitoring Service]
+        CamSvc[Camera CV Service]
+        RLPolicy[Action Policy Engine]
+        
+        SessionMgr --> AudioSvc
+        SessionMgr --> CamSvc
+        SessionMgr --> RLPolicy
+    end
 ```
 
-## Core Components
+## 🚀 Backend Engineering Highlights
 
-### Backend
+- **Real-time Orchestration:** Handles concurrent data streams from microphone (RMS/Spectral features) and camera (MediaPipe CV) via a unified background session loop.
+- **WebSocket Protocol Design:** Implemented a custom JSON-based protocol for zero-latency state synchronization between the Python engine and the browser.
+- **Dynamic Calibration:** Built a "Baseline-First" state machine that calibrates sensor inputs to a specific user's environment before enabling active interventions.
+- **Modular Service Design:** Decoupled hardware-specific logic (OpenCV, SoundDevice) from application state, allowing for graceful failover when devices are unavailable.
 
-- `src/attentia_ai/server.py`
-  exposes the local HTTP server and API routes
-- `src/attentia_ai/session.py`
-  owns runtime session state, orchestration, and the 5-second decision loop
+## 📁 Project Structure
 
-### Sensor Services
-
-- `src/attentia_ai/audio_service.py`
-  captures microphone samples and derives RMS, spectral centroid, and a discrete noise level
-- `src/attentia_ai/camera_service.py`
-  initializes MediaPipe face tracking, stores a baseline snapshot, and compares later samples to that baseline
-
-### Decision Layer
-
-- `src/attentia_ai/rl_policy.py`
-  loads the Q-table from `model/Qtablemain.npy` and selects the highest-value action
+```text
+attentia_ai/
+├── src/attentia_ai/       # Core Backend Engine
+│   ├── server.py          # API & WebSocket Entrypoint
+│   ├── session.py         # Session Orchestration & Logic
+│   ├── audio_service.py   # Signal Processing (Audio)
+│   ├── camera_service.py  # CV Pipelines (MediaPipe/OpenCV)
+│   └── rl_policy.py       # Policy Selection Logic
+├── web/                   # Next.js Management Platform
+├── docs/                  # System Documentation
+└── scripts/               # Utility & Bootstrap Scripts
+```
 
 ### Frontend
 

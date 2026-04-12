@@ -137,13 +137,17 @@ class BrowserRealtimeEngine:
             )
             self._send(
                 ws,
-                {
+                {  
                     "type": "calibration_progress",
                     "sessionId": session.session_id,
                     "recordedAt": recorded_at,
                     "progress": progress,
+                    "message": "Collecting baseline samples from camera and microphone.",
+                },
+            )
+
         # Logic-Level Calibration & Baseline Establishment
-        # This ensuring the engine waits for sufficient sensor density (packets) 
+        # This ensures the engine waits for sufficient sensor density (packets) 
         # and temporal stability (5s window) before establishing the state baseline.
         if (
             session.status == "calibrating"

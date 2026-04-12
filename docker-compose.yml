@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./model:/app/model
+    environment:
+      - PYTHONPATH=/app/src
+    # Note: On Linux, you can pass hardware devices to the container:
+    # devices:
+    #   - "/dev/video0:/dev/video0"
+    #   - "/dev/snd:/dev/snd"
+
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_SESSION_ENGINE_WS_URL=ws://localhost:8000/ws

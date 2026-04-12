@@ -128,6 +128,29 @@ http://127.0.0.1:8000
 - fallback states are used when hardware is unavailable
 - the frontend is intentionally minimal and operator-oriented
 
+## 🐳 Docker Support
+
+The platform is fully containerized for development and deployment. This demonstrates proficiency in multi-stage Docker builds and service orchestration.
+
+### Prerequisites
+- Docker & Docker Compose
+
+### Quick Start
+To build and run both the backend engine and the management platform:
+
+```bash
+docker-compose up --build
+```
+
+- **Backend:** `http://localhost:8000`
+- **Frontend Dashboard:** `http://localhost:3000`
+
+> [!IMPORTANT]
+> **Hardware Passthrough Note:**
+> While the code is container-ready, accessing the host machine's Camera and Microphone from within a Docker container on macOS is a known technical constraint (due to the Linux VM layer). 
+> - **In Production/Cloud:** Data would typically be streamed from the browser client frontend to the backend engine via WebSockets (already implemented in `web/`).
+> - **In Local Dev:** Direct hardware access via OpenCV/SoundDevice is best performed by running the backend natively (`python scripts/run_server.py`).
+
 ## Documentation Map
 
 - `docs/architecture.md`

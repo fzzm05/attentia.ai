@@ -55,79 +55,6 @@ attentia_ai/
 └── scripts/               # Utility & Bootstrap Scripts
 ```
 
-### Frontend
-
-- `frontend/index.html`
-  is a minimal operator-facing demo UI that starts and stops sessions, updates learner profile fields, and renders the live backend payload
-
-### Legacy / Prototype Files
-
-- `scripts/BaselineClass.py`
-  original standalone baseline comparison logic
-- `scripts/cameraAccessClass.py`
-  original standalone camera access implementation
-- `src/attentia_ai/audio_monitor.py`
-  earlier standalone audio-monitor prototype
-
-These files are useful reference material but are not the main runtime entrypoint for the integrated demo.
-
-## Installation
-
-### macOS / Linux
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-export PYTHONPATH=src
-python scripts/run_server.py
-```
-
-### Windows Command Prompt
-
-```bat
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-set PYTHONPATH=src
-python scripts/run_server.py
-```
-
-Then open:
-
-```text
-http://127.0.0.1:8000
-```
-
-## Demo Workflow
-
-1. Start the server.
-2. Open the frontend.
-3. Review the preflight banner to confirm Q-table, microphone, and camera readiness.
-4. Set `difficulty` and `gain_capability` if needed.
-5. Click `Start Session`.
-6. Let the backend calibrate and begin the periodic loop.
-7. Watch the frontend update with:
-   - current emotion
-   - distraction level
-   - noise level
-   - selected RL action
-   - raw API payload
-
-## Permissions and Platform Notes
-
-- On macOS, camera access must be granted to the terminal or Python process running the backend.
-- Microphone permissions may also need to be granted on first use.
-- OpenCV and MediaPipe behavior may vary slightly by OS and Python version.
-- The frontend itself does not access the camera or microphone directly in this branch; the backend does.
-
-## Current Constraints
-
-- the RL model is a static Q-table, not an online-learning agent
-- the camera emotion mapping is heuristic and intended for demo use
-- fallback states are used when hardware is unavailable
-- the frontend is intentionally minimal and operator-oriented
-
 ## 🐳 Docker Support
 
 The platform is fully containerized for development and deployment. This demonstrates proficiency in multi-stage Docker builds and service orchestration.
@@ -151,6 +78,28 @@ docker-compose up --build
 > - **In Production/Cloud:** Data would typically be streamed from the browser client frontend to the backend engine via WebSockets (already implemented in `web/`).
 > - **In Local Dev:** Direct hardware access via OpenCV/SoundDevice is best performed by running the backend natively (`python scripts/run_server.py`).
 
+## 🛠 Installation (Native)
+
+### macOS / Linux
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export PYTHONPATH=src
+python scripts/run_server.py
+```
+
+### Windows Command Prompt
+```bat
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+set PYTHONPATH=src
+python scripts/run_server.py
+```
+
+---
+
 ## Documentation Map
 
 - `docs/architecture.md`
@@ -161,12 +110,3 @@ docker-compose up --build
   product and RL state/action model
 - `docs/operations.md`
   setup, environment, permissions, troubleshooting, and demo checklist
-
-## Intended Next Steps
-
-- integrate the final frontend experience
-- refine camera-state classification with validated model logic
-- make distraction encoding more rigorous and explainable
-- add persistent session logging
-- add automated tests around state encoding and action selection
-- formalize deployment and packaging strategy

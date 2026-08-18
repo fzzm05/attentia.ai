@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduFlow - Focused Science Learning</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons --><script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Warm & Calm Colors (Optimized for focus) */
+        :root {
+            --warm-primary: #E65100;       /* Deep Orange - Primary Action */
+            --calm-secondary: #F5F5DC;     /* Creamy Beige - Gentle Highlight */
+            --calm-dark-primary: #2C2623;  /* Warm Dark Brown/Charcoal - Main BG */
+            --calm-dark-secondary: #3C3532;/* Component BG */
+            --text-highlight: #E0DED7;     /* Light Beige - Main Text */
+            --text-soft: #B3AEAA;          /* Muted Beige - Supportive Text */
+        }
+
+        .warm-primary-bg { background-color: var(--warm-primary); }
+        .warm-primary-text { color: var(--warm-primary); }
+        .warm-primary-border { border-color: var(--warm-primary); }
+        .warm-primary-hover-bg:hover { background-color: #CC4800; } 
+
+        .calm-secondary-bg { background-color: var(--calm-secondary); }
+        .calm-secondary-text { color: var(--calm-secondary); }
+        .calm-secondary-hover-bg:hover { background-color: #E0DED7; } 
+        
+        /* Layout */
+        .main-container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+        
+        /* Reduced Visual Noise for Chat */
+        .chat-container { height: 350px; }
+        .chat-bubble-user { background-color: #e68032; /* Darker, calmer user bubble */
+            border-radius: 0.75rem; border-bottom-right-radius: 0; }
+        .chat-bubble-guide { background-color: #cdb0a2; /* Component BG for AI */
+            border-radius: 0.75rem; border-bottom-left-radius: 0; }
+
+        /* Scrollbar styles maintained for dark mode comfort */
+        .scroll-y-auto::-webkit-scrollbar { width: 8px; }
+        .scroll-y-auto::-webkit-scrollbar-thumb { background-color: #5A524D; border-radius: 4px; }
+        .scroll-y-auto::-webkit-scrollbar-track { background-color: var(--calm-dark-primary); }
+        .scroll-y-auto { scrollbar-width: thin; scrollbar-color: #5A524D var(--calm-dark-primary); }
+
+        /* Loading Dots */
+        .loading-dot { animation: dot-flicker 1.4s infinite alternate; }
+        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dot-flicker {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-calm-dark-primary text-text-highlight antialiased font-sans">
+
+    <!-- 1. HEADER / NAVIGATION BAR (Clean and Consistent) -->
+    <header class="bg-calm-dark-secondary text-text-highlight shadow-lg sticky top-0 z-50">
+        <div class="flex items-center justify-between px-4 py-3 main-container">
+            <div class="flex items-center space-x-4">
+                <div class="text-xl font-bold warm-primary-text">EduFlow</div>
+                <div class="hidden sm:block border-l border-gray-600 h-6"></div>
+                <h1 class="text-base font-semibold truncate max-w-xs sm:max-w-md" title="Mastering Biology: Core Concepts">
+                    Mastering Biology: Core Concepts
+                </h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Course Outline Button (Replaces busy sidebar) -->
+                <button id="outlineToggleBtn" class="flex items-center space-x-2 px-3 py-2 text-sm font-semibold rounded-lg bg-gray-700 hover:bg-gray-600 transition text-text-highlight">
+                    <i data-lucide="list-collapse" class="w-4 h-4"></i>
+                    <span>Course Outline</span>
+                </button>
+                <!-- Parent/Guardian Control Button -->
+                <button id="parentControlsToggleBtn" class="px-2 py-1 hover:bg-gray-700 rounded-full transition text-text-highlight" aria-label="Parent and Guardian Controls">
+                    <i data-lucide="shield" class="w-6 h-6"></i>
+                </button>
+                <!-- Accessibility Button (Prominent) -->
+                <button id="accessibilityToggleBtn" class="px-2 py-1 hover:bg-gray-700 rounded-full transition text-text-highlight" aria-label="Accessibility Settings">
+                    <i data-lucide="accessibility" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. MAIN LEARNING AREA -->
+    <main class="main-container">
+        
+        <!-- A. VIDEO PLAYER (Center Focus) -->
+        <section class="bg-calm-dark-primary pt-4 pb-8">
+            <div class="aspect-video bg-black w-full shadow-2xl rounded-xl overflow-hidden relative">
+                <video id="courseVideo" controls poster="https://placehold.co/1280x720/2C2623/E65100?text=Focused+Science+Lesson" class="w-full h-full object-cover">
+                    <source src="#" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+
+        <!-- B. LEARNING GUIDE / AI TUTOR PANEL (Consolidated Interaction) -->
+        <section id="learning-guide-panel" class="bg-calm-dark-secondary p-6 rounded-xl shadow-2xl mb-8 space-y-6">
+            <div class="flex items-center space-x-3 warm-primary-text border-b border-gray-700 pb-4">
+                <i data-lucide="message-circle" class="w-6 h-6"></i>
+                <h2 class="text-xl font-bold">Your Learning Guide</h2>
+            </div>
+
+            <!-- Chat History Area -->
+            <div id="ai-chat-history" class="space-y-4 overflow-y-auto scroll-y-auto chat-container p-2 rounded-lg bg-calm-dark-primary border border-gray-700">
+                <div class="flex justify-start">
+                    <div class="p-3 chat-bubble-guide max-w-xs sm:max-w-lg shadow-md">
+                        <span class="font-bold warm-primary-text text-xs">Learning Guide</span>
+                        <p class="text-sm mt-1 text-text-highlight">Hello! I'm here to help you focus. Ask me about the lesson or anything that might be confusing you right now.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action: Summary Button (Retained) -->
+            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
+                <div class="text-text-highlight">
+                    <i data-lucide="sparkles" class="w-4 h-4 inline-block calm-secondary-text mr-2"></i>
+                    <span class="font-semibold">Need a quick review?</span>
+                    <p class="text-sm text-text-soft">Generate a concise summary of the entire lecture for revision.</p>
+                </div>
+                <button id="generateSummaryBtn" class="warm-primary-bg text-text-highlight font-bold py-2 px-4 rounded-lg warm-primary-hover-bg transition-colors w-full sm:w-auto flex items-center justify-center disabled:opacity-50">
+                    <i data-lucide="clipboard-list" class="w-4 h-4 inline mr-2 text-text-highlight"></i>
+                    <span id="summaryBtnText">Generate Summary</span>
+                </button>
+            </div>
+
+            <!-- Input Area -->
+            <div class="pt-2">
+                <label for="ai-question" class="sr-only">Ask your question</label>
+                <div class="flex space-x-3">
+                    <textarea id="ai-question" rows="2" class="flex-1 p-3 border border-gray-700 bg-calm-dark-primary rounded-lg focus:ring-warm-primary focus:border-warm-primary transition resize-none text-text-highlight" placeholder="What is the purpose of the water molecule in the equation?"></textarea>
+                    <button id="askAiBtn" class="warm-primary-bg text-text-highlight font-semibold py-2 px-6 rounded-lg warm-primary-hover-bg transition-colors disabled:opacity-50 flex items-center justify-center">
+                        <i data-lucide="send" class="w-4 h-4 inline text-text-highlight"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- C. DYNAMIC PANELS (Hidden/Modal Logic in a Real App) -->
+        
+        <!-- Course Outline Panel (For Structure) -->
+        <section id="course-outline-panel" class="bg-calm-dark-secondary p-6 rounded-xl shadow-2xl mb-8 hidden">
+             <h3 class="text-xl font-bold mb-4 warm-primary-text border-b border-gray-700 pb-3">Course Outline</h3>
+             <div class="divide-y divide-gray-700">
+                <!-- Section 1 (Current) -->
+                <div class="py-3">
+                    <div class="font-bold text-lg warm-primary-text mb-2">Section 1: Photosynthesis Basics</div>
+                    <ul class="text-sm space-y-2 pl-4">
+                        <li class="flex items-center space-x-2 text-text-highlight font-semibold">
+                            <i data-lucide="play-circle" class="w-4 h-4 warm-primary-text"></i>
+                            <span>1. The Photosynthesis Equation</span>
+                        </li>
+                        <li class="flex items-center space-x-2 text-text-soft">
+                            <i data-lucide="circle" class="w-4 h-4 text-text-soft"></i>
+                            <span>2. Chloroplasts and Chlorophyll</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Section 2 -->
+                <div class="py-3">
+                    <div class="font-bold text-lg text-text-highlight mb-2">Section 2: The Cell Structure</div>
+                    <p class="text-sm text-text-soft pl-4">Details hidden to reduce visual input. Click to expand in a full app.</p>
+                </div>
+             </div>
+        </section>
+
+        <!-- Accessibility Settings Panel -->
+        <section id="accessibility-panel" class="bg-calm-dark-secondary p-6 rounded-xl shadow-2xl mb-8 hidden">
+             <h3 class="text-xl font-bold mb-4 warm-primary-text border-b border-gray-700 pb-3">Accessibility Settings</h3>
+             <p class="text-text-soft mb-4">Adjust visual and auditory settings for maximum comfort and focus.</p>
+             <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 bg-calm-dark-primary rounded-lg border border-gray-700">
+                    <label for="highContrast" class="font-medium text-text-highlight">High Contrast Mode (Visual)</label>
+                    <input type="checkbox" id="highContrast" class="w-5 h-5 warm-primary-text border-gray-600 rounded focus:ring-warm-primary bg-gray-900">
+                </div>
+                <div class="flex items-center justify-between p-3 bg-calm-dark-primary rounded-lg border border-gray-700">
+                    <label for="fontSize" class="font-medium text-text-highlight">Text Size (Reading)</label>
+                    <select id="fontSize" class="border border-gray-700 bg-gray-900 text-text-highlight rounded-lg py-1 px-2">
+                        <option value="medium" selected>Default (Medium)</option>
+                        <option value="large">Larger</option>
+                        <option value="x-large">Extra Large</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-calm-dark-primary rounded-lg border border-gray-700">
+                    <label for="captionsDefault" class="font-medium text-text-highlight">Auto Captions On (Auditory)</label>
+                    <input type="checkbox" id="captionsDefault" checked class="w-5 h-5 warm-primary-text border-gray-600 rounded focus:ring-warm-primary bg-gray-900">
+                </div>
+             </div>
+        </section>
+
+        <!-- Parent/Guardian Controls Panel (New Safety Feature) -->
+        <section id="parent-controls-panel" class="bg-calm-dark-secondary p-6 rounded-xl shadow-2xl mb-8 hidden">
+            <h3 class="text-xl font-bold mb-4 warm-primary-text border-b border-gray-700 pb-3">Parent / Guardian Safety Controls</h3>
+            <p class="text-text-soft mb-4">Manage session limits, AI responsiveness, and content filtering for a stable learning experience.</p>
+            
+            <!-- Session Timer Control -->
+            <div class="space-y-4">
+                <div class="p-3 bg-calm-dark-primary rounded-lg border border-gray-700">
+                    <label for="sessionLimit" class="font-medium text-text-highlight block mb-2">Max Session Time (Minutes)</label>
+                    <div class="flex space-x-2 items-center">
+                        <select id="sessionLimit" class="border border-gray-700 bg-gray-900 text-text-highlight rounded-lg py-1 px-2 flex-1">
+                            <option value="30">30 Minutes</option>
+                            <option value="60">60 Minutes</option>
+                            <option value="90">90 Minutes</option>
+                            <option value="120">120 Minutes</option>
+                        </select>
+                        <button class="warm-primary-bg text-text-highlight text-sm font-bold py-1 px-3 rounded-lg warm-primary-hover-bg transition-colors">Set Limit</button>
+                    </div>
+                    <p class="text-xs text-text-soft mt-1">Automatically pauses the lesson when the time limit is reached to manage cognitive fatigue.</p>
+                </div>
+
+                <!-- AI Frustration Monitoring Toggle -->
+                 <div class="flex items-center justify-between p-3 bg-calm-dark-primary rounded-lg border border-gray-700">
+                    <label for="frustrationMonitor" class="font-medium text-text-highlight">AI Frustration Monitoring</label>
+                    <input type="checkbox" id="frustrationMonitor" checked class="w-5 h-5 warm-primary-text border-gray-600 rounded focus:ring-warm-primary bg-gray-900">
+                </div>
+
+                <!-- Content Filtering Toggle -->
+                <div class="flex items-center justify-between p-3 bg-calm-dark-primary rounded-lg border border-gray-700">
+                    <label for="contentFilter" class="font-medium text-text-highlight">Strict Content Filtering</label>
+                    <input type="checkbox" id="contentFilter" checked class="w-5 h-5 warm-primary-text border-gray-600 rounded focus:ring-warm-primary bg-gray-900">
+                </div>
+
+                <p class="text-xs text-text-soft pt-2">Note: Access to this panel should be restricted in a deployed environment (e.g., password or biometric lock).</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // --- GEMINI API SETUP ---
+        // REMINDER: You must replace "" with your actual Gemini API key for local testing.
+        const API_KEY = "AIzaSyAdDxTZ9Do057MnyNmDs1q9pCDuYljB1dk"; 
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+        
+        // --- MOCK COURSE DATA (CONTEXT FOR GEMINI) ---
+        const currentLectureTitle = "1. The Photosynthesis Equation and Light Absorption";
+        const currentLectureTranscript = `
+            Welcome to the first lecture on Photosynthesis! This is the process used by plants, algae, and certain bacteria to convert light energy into chemical energy, primarily sugar. 
+            The basic equation for photosynthesis is: 6CO₂ + 6H₂O + Light Energy → C₆H₁₂O₆ + 6O₂. 
+            This means Carbon Dioxide and Water, with the help of light, produce Glucose (sugar) and Oxygen. 
+            The process occurs within the chloroplasts, specifically in the thylakoid membranes where chlorophyll absorbs light energy. 
+            There are two main stages: the light-dependent reactions and the light-independent reactions (Calvin Cycle). 
+            Your challenge is to identify the purpose of the water molecule in the overall process. Remember, understanding the inputs and outputs is crucial!
+        `;
+
+        // --- AI STABILITY MONITORING ---
+        let questionCount = 0;
+        let lastQuestionTime = 0;
+        const frustrationThreshold = 3; // Max 3 questions in quick succession (e.g., under 10 seconds)
+
+        // ----------------------------------------------------
+        // 1. UTILITY FUNCTIONS
+        // ----------------------------------------------------
+
+        /**
+         * Generic function to call the Gemini API with exponential backoff.
+         */
+        async function callGeminiApi(payload, maxRetries = 5) {
+            const url = `${API_URL}?key=${API_KEY}`;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        return await response.json();
+                    } else if (response.status === 429) {
+                        const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                        console.warn(`Rate limit exceeded (429). Retrying in ${(delay / 1000).toFixed(1)}s...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                    } else {
+                        console.error(`Gemini API Error: ${response.status} ${response.statusText}`);
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    return null;
+                }
+            }
+            console.error('Gemini API failed after multiple retries.');
+            return null;
+        }
+
+        /**
+         * Adds a chat bubble to the history.
+         */
+        function addChatBubble(text, isUser, sourcesHtml = '') {
+            const chatHistory = document.getElementById('ai-chat-history');
+            const bubble = document.createElement('div');
+            
+            if (isUser) {
+                bubble.className = 'flex justify-end';
+                bubble.innerHTML = `
+                    <div class="chat-bubble-user text-text-highlight p-3 max-w-xs sm:max-w-lg shadow-md">
+                        <p class="text-sm whitespace-pre-wrap">${text}</p>
+                    </div>
+                `;
+            } else {
+                bubble.className = 'flex justify-start';
+                bubble.innerHTML = `
+                    <div class="chat-bubble-guide text-text-highlight p-3 max-w-xs sm:max-w-lg shadow-md">
+                        <span class="font-bold warm-primary-text text-xs">Learning Guide</span>
+                        <p class="text-sm mt-1 text-text-highlight whitespace-pre-wrap">${text}</p>
+                        ${sourcesHtml}
+                    </div>
+                `;
+            }
+
+            chatHistory.appendChild(bubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            return bubble;
+        }
+
+        /**
+         * Displays a temporary loading bubble for the AI response.
+         */
+        function showLoadingBubble() {
+            const chatHistory = document.getElementById('ai-chat-history');
+            const loadingBubble = document.createElement('div');
+            loadingBubble.id = 'ai-loading-bubble';
+            loadingBubble.className = 'flex justify-start';
+            loadingBubble.innerHTML = `
+                <div class="chat-bubble-guide text-text-highlight p-3 max-w-xs sm:max-w-md shadow-md">
+                    <span class="font-bold warm-primary-text text-xs">Learning Guide</span>
+                    <p class="text-sm mt-1 flex space-x-1 text-text-highlight">
+                        <span class="loading-dot">.</span>
+                        <span class="loading-dot">.</span>
+                        <span class="loading-dot">.</span>
+                    </p>
+                </div>
+            `;
+            chatHistory.appendChild(loadingBubble);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            return loadingBubble;
+        }
+
+        /**
+         * Extracts text and source URLs from the Gemini response.
+         */
+        function processGeminiResponse(result) {
+            let text = "Sorry, I couldn't generate a response right now. Please try again.";
+            let sources = [];
+            
+            const candidate = result.candidates?.[0];
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                text = candidate.content.parts[0].text;
+            }
+
+            const groundingMetadata = candidate?.groundingMetadata;
+            if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                sources = groundingMetadata.groundingAttributions
+                    .map(attribution => ({
+                        uri: attribution.web?.uri,
+                        title: attribution.web?.title,
+                    }))
+                    .filter(source => source.uri && source.title);
+            }
+            return { text, sources };
+        }
+
+        // ----------------------------------------------------
+        // 2. MAIN APPLICATION LOGIC
+        // ----------------------------------------------------
+        
+        /**
+         * Simulates AI monitoring for rapid, repetitive questions that may indicate frustration.
+         */
+        function checkFrustrationLevel() {
+            const currentTime = Date.now();
+            const timeDiff = currentTime - lastQuestionTime;
+
+            if (timeDiff < 10000) { // If less than 10 seconds since last question
+                questionCount++;
+            } else {
+                questionCount = 1; // Reset count
+            }
+            lastQuestionTime = currentTime;
+
+            // Check if monitoring is enabled and threshold is exceeded
+            const monitorEnabled = document.getElementById('frustrationMonitor')?.checked ?? true;
+
+            if (monitorEnabled && questionCount >= frustrationThreshold) {
+                questionCount = 0; // Reset after intervention
+                return "I hear you are asking many questions quickly. That's okay! Let's take a deep breath together. Try asking just one question clearly, or maybe watch the video again. We can do this!";
+            }
+            return null;
+        }
+
+        // --- GEMINI FEATURE 1: CONTEXTUAL Q&A (Ask My Tutor) ---
+
+        async function askAi() {
+            const userQuestion = aiQuestionInput.value.trim();
+            if (!userQuestion) return;
+            
+            // 0. Safety Check
+            const frustrationResponse = checkFrustrationLevel();
+            if (frustrationResponse) {
+                addChatBubble(userQuestion, true);
+                addChatBubble(frustrationResponse, false);
+                aiQuestionInput.value = '';
+                return;
+            }
+
+            // 1. UI State Update
+            addChatBubble(userQuestion, true);
+            const loadingBubble = showLoadingBubble();
+            aiQuestionInput.value = '';
+            askAiBtn.disabled = true;
+            aiQuestionInput.disabled = true;
+
+            // 2. Construct Prompt (Contextual Prompt Engineering)
+            const systemPrompt = `You are a calm, supportive, and expert biology tutor for a learning application designed for children, potentially including those with ASD. Your answers must be simple, direct, and non-overwhelming. Your goal is to simplify concepts and encourage the learner. Keep the answer brief (max 3-4 sentences). Use the search tool for authority.`;
+            
+            const userQuery = `
+                Course Context: The learner is currently focused on the lecture "${currentLectureTitle}".
+                Lecture Content Summary: ${currentLectureTranscript.substring(0, 500)}...
+                ---
+                Learner Question: ${userQuestion}
+            `;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            // 3. API Call
+            const result = await callGeminiApi(payload);
+
+            // 4. UI Update (Hide Loading, Show Response)
+            loadingBubble.remove();
+            
+            if (result) {
+                const { text, sources } = processGeminiResponse(result);
+                
+                let sourcesHtml = '';
+                if (sources.length > 0) {
+                    sourcesHtml = `
+                        <div class="mt-2 text-xs text-text-soft border-t pt-2 border-gray-700">
+                            Sources:
+                            <ul class="list-disc list-inside space-y-0.5 mt-1">
+                                ${sources.slice(0, 3).map(s => `<li><a href="${s.uri}" target="_blank" class="warm-primary-text hover:underline" title="${s.uri}">${s.title}</a></li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                addChatBubble(text, false, sourcesHtml);
+            } else {
+                addChatBubble("I'm sorry, I encountered an issue. Please ask your question again.", false);
+            }
+
+            // 5. Reset UI State
+            askAiBtn.disabled = false;
+            aiQuestionInput.disabled = false;
+        }
+
+        // --- GEMINI FEATURE 2: LECTURE SUMMARY GENERATOR ---
+
+        async function generateSummary() {
+            // 1. UI State Update
+            generateSummaryBtn.disabled = true;
+            summaryBtnText.textContent = 'Generating...';
+            
+            const tempSummaryBubble = addChatBubble("Generating a concise summary to help you remember the main points...", false);
+            tempSummaryBubble.querySelector('p').classList.add('calm-secondary-text', 'font-semibold');
+            
+            // 2. Construct Prompt
+            const systemPrompt = `You are a helpful study partner. Read the lecture transcript and create a concise, 3-point bulleted summary of the core concepts and key challenge/takeaway for revision. Use simple language.`;
+            
+            const userQuery = `
+                Lecture Title: ${currentLectureTitle}
+                ---
+                Transcript: ${currentLectureTranscript}
+                ---
+                Please generate the 3-point summary.
+            `;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            // 3. API Call
+            const result = await callGeminiApi(payload);
+
+            // 4. UI Update (Show Response)
+            tempSummaryBubble.remove();
+            
+            if (result) {
+                const { text } = processGeminiResponse(result);
+                addChatBubble(`Here is your summary for **${currentLectureTitle}**: \n\n${text}`, false);
+            } else {
+                addChatBubble("I'm sorry, I couldn't generate the summary due to an error.", false);
+            }
+
+            // 5. Reset UI State
+            generateSummaryBtn.disabled = false;
+            summaryBtnText.textContent = 'Generate Summary';
+        }
+
+        // ----------------------------------------------------
+        // 3. UI MANAGEMENT AND EVENT LISTENERS
+        // ----------------------------------------------------
+
+        const aiQuestionInput = document.getElementById('ai-question');
+        const askAiBtn = document.getElementById('askAiBtn');
+        const generateSummaryBtn = document.getElementById('generateSummaryBtn');
+        const summaryBtnText = document.getElementById('summaryBtnText');
+        
+        const outlinePanel = document.getElementById('course-outline-panel');
+        const accessibilityPanel = document.getElementById('accessibility-panel');
+        const parentControlsPanel = document.getElementById('parent-controls-panel');
+        
+        const outlineToggleBtn = document.getElementById('outlineToggleBtn');
+        const accessibilityToggleBtn = document.getElementById('accessibilityToggleBtn');
+        const parentControlsToggleBtn = document.getElementById('parentControlsToggleBtn');
+
+
+        // Function to control which auxiliary panel is visible
+        function toggleAuxiliaryPanel(panelId) {
+            const panels = [outlinePanel, accessibilityPanel, parentControlsPanel];
+            
+            panels.forEach(panel => {
+                const isTarget = panel.id === panelId;
+                const isCurrentlyVisible = !panel.classList.contains('hidden');
+                
+                if (isTarget) {
+                    panel.classList.toggle('hidden', isCurrentlyVisible);
+                } else {
+                    // Hide others if they are visible
+                    panel.classList.add('hidden');
+                }
+            });
+            
+            // Update button visual state (simplified for dark mode)
+            outlineToggleBtn.classList.toggle('warm-primary-bg', !outlinePanel.classList.contains('hidden'));
+            accessibilityToggleBtn.classList.toggle('warm-primary-bg', !accessibilityPanel.classList.contains('hidden'));
+            parentControlsToggleBtn.classList.toggle('warm-primary-bg', !parentControlsPanel.classList.contains('hidden'));
+        }
+
+        // Event Listeners
+        outlineToggleBtn.addEventListener('click', () => toggleAuxiliaryPanel('course-outline-panel'));
+        accessibilityToggleBtn.addEventListener('click', () => toggleAuxiliaryPanel('accessibility-panel'));
+        parentControlsToggleBtn.addEventListener('click', () => toggleAuxiliaryPanel('parent-controls-panel'));
+        
+        askAiBtn.addEventListener('click', askAi);
+        generateSummaryBtn.addEventListener('click', generateSummary);
+
+        // Allow pressing Enter/Shift+Enter in the textarea
+        aiQuestionInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askAi();
+            }
+        });
+
+    </script>
+</body>
+</html>
